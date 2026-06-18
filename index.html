@@ -139,6 +139,11 @@ section{padding:64px 0;border-bottom:1px solid var(--rule)}
 .dlbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
 .dlnote{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.02em}
 .nhead{cursor:pointer}
+.tkdoss{grid-column:1/-1;border-color:rgba(200,163,91,.5)!important;background:linear-gradient(180deg,var(--card),var(--bg2))}
+.tkdoss.open .det{max-height:none}
+.tkdoss .nhead h3{color:var(--gold2)}
+.tkdoss .meta .dt{font-weight:500;letter-spacing:.08em}
+.tkopenbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
 
 /* ============ SPINE / ARC ============ */
 .spine{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
@@ -793,7 +798,10 @@ function applyFilters(){
   var list=NOTES.filter(noteMatches).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
   document.getElementById('count').textContent=list.length+' note'+(list.length===1?'':'s')+
     (activeTheme?' · '+activeTheme:'')+(activeType?' · '+activeType:'')+(q?' · "'+q+'"':'');
-  document.getElementById('archiveGrid').innerHTML=list.map(function(n){
+  var dossHTML='';
+  if(q){var symU=q.toUpperCase().trim();var dt=(typeof TICKERS!=='undefined')&&(TICKERS[symU]||TICKERS[TK_ALIAS[symU]]);
+    if(dt){var dsym=TICKERS[symU]?symU:TK_ALIAS[symU];dossHTML=dossierCard(dsym,dt);}}
+  var notesHTML=list.map(function(n){
     var thms=(n.themes||[]).map(function(t){return '<span class="tag-s">'+t+'</span>'}).join('');
     var na=(typeof NOTEAUTH!=='undefined'&&NOTEAUTH[n.id]);var nq=(na&&na.quotes)||[];
     var qb=nq.length?'<div class="tkx-lead">Key quotes from this report</div><div class="tkq">'+nq.map(function(x){return '<blockquote class="tkqq">“'+esc(String(x).replace(/^[“”"\s]+|[“”"\s]+$/g,''))+'”</blockquote>'}).join('')+'</div>':'';
@@ -814,7 +822,36 @@ function applyFilters(){
         '<div class="dlrow"><button type="button" class="dlbtn"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>Download original PDF</button>'+
           '<span class="dlnote">.pdf · Visser\'s full 22V note</span></div>'+
       '</div></div>';
-  }).join('') || '<p class="dim" style="grid-column:1/-1">No notes match. Try clearing a filter.</p>';
+  }).join('');
+  document.getElementById('archiveGrid').innerHTML=dossHTML+notesHTML||
+    (dossHTML?dossHTML:'<p class="dim" style="grid-column:1/-1">No notes match. Try clearing a filter.</p>');
+  if(dossHTML){var dc=document.querySelector('.tkdoss');if(dc)updateDossier(dc);}
+}
+function dossierCard(sym,t){
+  var M=t.mentions,P=t.pick;
+  var bull=M.filter(function(m){return /bull|new pick|add/.test(m.stance)}).length;
+  var ret=P?('<span class="pill '+(P.ret>=0?'long':'short')+'" style="margin-left:8px">'+(P.kind==='short'?'short · ':'')+'tracked '+(P.ret>=0?'+':'')+P.ret.toFixed(0)+'%</span>'):'';
+  return '<div class="note tkdoss open" data-tkcard="'+esc(sym)+'">'+
+    '<div class="nhead" tabindex="0" role="button" aria-label="Open full ticker view">'+
+      '<div class="meta"><span class="dt">◆ Visser&rsquo;s thesis on this name</span><span class="ty">'+M.length+' report'+(M.length>1?'s':'')+'</span>'+ret+'</div>'+
+      '<h3>'+esc(sym)+' &middot; '+esc(t.name)+'</h3>'+
+      '<p class="one">'+shortDate2(M[0].date)+' – '+shortDate2(M[M.length-1].date)+' &middot; '+bull+' bullish mentions &middot; slide for depth, or open the full view.</p>'+
+    '</div>'+
+    '<div class="det">'+
+      '<div class="sumctl">'+
+        '<div class="seg depthseg" role="group" aria-label="depth"><button type="button" data-depth="basic" class="on">Basic</button><button type="button" data-depth="technical">Technical</button></div>'+
+        '<div class="lenwrap"><input type="range" min="0" max="2" step="1" value="1" class="lenslider" aria-label="length"><span class="lenlbl">Medium</span></div>'+
+      '</div>'+
+      '<div class="summary"></div>'+
+      '<div class="dlrow"><button type="button" class="dlbtn tkopenbtn"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H9M17 7v8"/></svg>Open full ticker view</button></div>'+
+    '</div></div>';
+}
+function updateDossier(card){
+  var sym=card.getAttribute('data-tkcard'),t=tkLookup(sym);if(!t)return;
+  var len=+card.querySelector('.lenslider').value;
+  var tech=card.querySelector('.depthseg button[data-depth="technical"]').classList.contains('on');
+  card.querySelector('.lenlbl').textContent=['Short','Medium','Full'][len];
+  card.querySelector('.summary').innerHTML=composeTickerSummary(t,sym,len,tech);
 }
 
 /* ---- per-report dynamic summary + download ---- */
@@ -859,17 +896,20 @@ var archiveWired=false;
 function wireArchive(){
   if(archiveWired)return;archiveWired=true;
   var grid=document.getElementById('archiveGrid');
+  function refresh(card){if(card.classList.contains('tkdoss'))updateDossier(card);else updateCardSummary(card);}
   grid.addEventListener('click',function(e){
+    var op=e.target.closest('.tkopenbtn');if(op){openTicker(op.closest('[data-tkcard]').getAttribute('data-tkcard'));return;}
     var dl=e.target.closest('.dlbtn');if(dl){downloadReport(dl.closest('.note').getAttribute('data-id'),dl);return;}
     var db=e.target.closest('.depthseg button');if(db){var seg=db.parentNode;
       Array.prototype.forEach.call(seg.children,function(b){b.classList.remove('on')});db.classList.add('on');
-      updateCardSummary(db.closest('.note'));return;}
+      refresh(db.closest('.note'));return;}
     if(e.target.closest('.lenwrap'))return;
     var head=e.target.closest('.nhead');if(head){var card=head.closest('.note');
+      if(card.classList.contains('tkdoss')){openTicker(card.getAttribute('data-tkcard'));return;}
       var open=card.classList.toggle('open');head.setAttribute('aria-expanded',open?'true':'false');
       if(open)updateCardSummary(card);return;}
   });
-  grid.addEventListener('input',function(e){if(e.target.classList.contains('lenslider'))updateCardSummary(e.target.closest('.note'));});
+  grid.addEventListener('input',function(e){if(e.target.classList.contains('lenslider'))refresh(e.target.closest('.note'));});
   grid.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;
     var head=e.target.closest('.nhead');if(head){e.preventDefault();var card=head.closest('.note');
       var open=card.classList.toggle('open');head.setAttribute('aria-expanded',open?'true':'false');if(open)updateCardSummary(card);}});
