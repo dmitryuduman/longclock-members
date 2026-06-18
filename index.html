@@ -84,6 +84,47 @@ section{padding:64px 0;border-bottom:1px solid var(--rule)}
 .sechead h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:14px}
 .sechead p{color:var(--ink2);font-size:16px;margin:0}
 
+/* ============ RECENT / NOW ============ */
+.recent-strip{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:34px;align-items:center}
+.rs-lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);width:100%;margin-bottom:3px}
+.rs-item{font-family:var(--mono);font-size:11.5px;color:var(--ink2);background:var(--bg2);border:1px solid var(--rule);border-radius:20px;padding:5px 12px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.rs-item .d{color:var(--gold);margin-right:7px}
+.moves{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:760px){.moves{grid-template-columns:1fr}}
+.move{background:var(--card);border:1px solid var(--rule);border-top:3px solid var(--teal);border-radius:14px;padding:22px 22px;transition:border-color .25s,transform .25s}
+.move:hover{transform:translateY(-3px)}
+.move.feat{grid-column:1/-1;background:linear-gradient(180deg,var(--card),var(--bg2))}
+.move .mtag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;margin-bottom:12px;display:inline-flex;align-items:center;gap:8px}
+.move .mtag .dot2{width:7px;height:7px;border-radius:50%;display:inline-block}
+.move h3{font-size:20px;margin-bottom:11px;line-height:1.16}
+.move.feat h3{font-size:25px;max-width:24ch}
+.move p{font-size:14px;color:var(--ink2);margin:0 0 15px;line-height:1.55}
+.move.feat p{max-width:74ch}
+.move .refs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+.move .ref{font-family:var(--mono);font-size:10.5px;color:var(--ink3);border:1px solid var(--rule);border-radius:5px;padding:2px 8px}
+.move .ref b{color:var(--gold);font-weight:500;margin-right:3px}
+.move .mpick{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ============ SUMMARY CONTROLS (per report) ============ */
+.sumctl{display:flex;flex-wrap:wrap;align-items:center;gap:13px 18px;padding:14px 0 4px;border-top:1px solid var(--rule);margin-top:14px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:20px;overflow:hidden}
+.seg button{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:6px 13px;background:transparent;border:none;color:var(--ink3);cursor:pointer;transition:all .15s}
+.seg button.on{background:var(--gold);color:#1a160c}
+.lenwrap{display:flex;align-items:center;gap:11px;flex:1;min-width:170px}
+.lenwrap input[type=range]{flex:1;accent-color:var(--gold);height:4px;cursor:pointer}
+.lenlbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);min-width:54px}
+.summary{font-size:13.5px;color:var(--ink2);line-height:1.55;padding-top:12px;min-height:38px}
+.summary p{margin:0 0 10px}
+.summary .kp{margin:10px 0 0}
+.summary .q{margin-top:12px}
+.summary .tks{margin-top:12px}
+.dlrow{margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dlbtn{font-family:var(--mono);font-size:11px;letter-spacing:.03em;padding:9px 15px;border-radius:8px;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s}
+.dlbtn:hover{border-color:var(--gold);color:var(--gold)}
+.dlbtn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8}
+.dlnote{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.02em}
+.nhead{cursor:pointer}
+
 /* ============ SPINE / ARC ============ */
 .spine{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media(max-width:900px){.spine{grid-template-columns:repeat(2,1fr)}}
@@ -234,6 +275,7 @@ footer p{font-size:13px;color:var(--ink3);line-height:1.6;margin:0 0 12px;max-wi
   <div class="navin">
     <span class="brand">The <b>Visser</b> Files</span>
     <div class="navlinks">
+      <a href="#recent">Now</a>
       <a href="#spine">The Spine</a>
       <a href="#scorecard">Scorecard</a>
       <a href="#themes">Themes</a>
@@ -256,6 +298,17 @@ footer p{font-size:13px;color:var(--ink3);line-height:1.6;margin:0 0 12px;max-wi
     </div>
   </div>
 </header>
+
+<!-- RECENT -->
+<section id="recent"><div class="wrap">
+  <div class="sechead reveal">
+    <div class="eyebrow">The Last Two Months &middot; Apr–Jun 2026</div>
+    <h2>What's moving now</h2>
+    <p>The freshest turns in his thinking, newest first. The build-out era is maturing into what he calls a mid-cycle slowdown — and the action is rotating from the obvious infrastructure basket up to where intelligence gets <span style="color:var(--gold2)">applied</span>, even as the supply chain itself becomes the story.</p>
+  </div>
+  <div class="recent-strip reveal" id="recentStrip"></div>
+  <div class="moves" id="moves"></div>
+</div></section>
 
 <!-- SPINE -->
 <section id="spine"><div class="wrap">
@@ -400,7 +453,62 @@ var PHASES=[
 ];
 
 function build(){
-  renderSpine();renderScorecard();renderThemes();renderRotations();renderArchive();initReveal();
+  renderSpine();renderRecent();renderScorecard();renderThemes();renderRotations();renderArchive();initReveal();
+}
+
+/* ============ WHAT'S MOVING NOW ============ */
+var RECENT_MOVES=[
+ {tag:"Rotation · newest",col:"var(--gold)",feat:true,
+  title:"From building intelligence to applying it",
+  body:"The clearest shift of the period. After agentic AI went from skepticism to consensus in barely five months, Visser calls a mid-cycle slowdown: the boom is intact, but the easy money in the obvious infrastructure basket is gone. The scarce resource moves from the factory that makes intelligence to the trusted layer that applies it — drug discovery, healthcare, agentic software. Infrastructure endures, but it becomes a stockpicker's market, not a basket trade.",
+  refs:[{d:"15 Jun",t:"The AI Mid-Cycle Slowdown"},{d:"4 Jun",t:"The Fireworks Show Is Over"}],
+  picks:["LLY","AVGO","GOOGL"]},
+ {tag:"Escalating risk",col:"var(--down)",
+  title:"Supply-chain fragility becomes the story",
+  body:"The capex fear has flipped. The old worry was fake demand; the new risk is that demand is so real and strategic that everyone hoards the same scarce parts of a fragile, correlated chain. With ~$1.4T of hyperscaler backlog, buyers move from just-in-time to just-in-case. Fujikura's 65%+ crash — on raw-material and logistics shortages, not weak demand — was the first real glimpse, with HBM and CoWoS packaging the central choke points.",
+  refs:[{d:"26 May",t:"Bandwidth Wars"},{d:"19 May",t:"AI's Strait of Hormuz"}],
+  picks:["MU","GLW","COHR","MRVL"]},
+ {tag:"New scarcity leg",col:"var(--teal)",
+  title:"Power semiconductors, the next scarcity trade",
+  body:"The scarcity baton passes from memory and foundry toward power. NVIDIA's reported 800V DC architecture push, plus the move of intelligence to the edge, converge into one theme — SiC, GaN, analog and power-management chips. Framing the scale, Musk's Terafab implies compute demand roughly 50x today's annual industry output: AI running headlong into the physical world that powers it.",
+  refs:[{d:"27 Apr",t:"The Edge Awakens"},{d:"15 Apr",t:"The Terawatt Gap"}],
+  picks:["INTC","TXN","NVDA","Silver"]},
+ {tag:"New pick · app layer",col:"var(--gold2)",
+  title:"The GLP-1 'Manhattan Project'",
+  body:"The sharpest expression of the rotation up the stack. Eli Lilly is using Mounjaro/Zepbound cash flow to build a vertical biological-AI platform — discovery, genetic medicine, manufacturing, longevity. Unlike the commoditizing horizontal LLM race, its moat is proprietary data, including decades of failed experiments, fed through a closed loop (LillyPod's 1,000+ Blackwell Ultra GPUs, plus Isomorphic and Insilico).",
+  refs:[{d:"5 Jun",t:"The GLP-1 Manhattan Project"}],
+  picks:["LLY"]},
+ {tag:"Thesis confirmed · added",col:"var(--up)",
+  title:"The chemical-layer 'purity tax', validated",
+  body:"Entegris moved from a fresh spotlight pick to an add. As AI shifts chips from unit-growth to content-per-wafer, HBM4 stacking and hybrid bonding create a purity wall where contamination destroys high-value packages — making filtration yield-insurance. The June update: Vera Rubin raises materials intensity again, and NAND emerges as the structural surprise, named 39 times across two calls.",
+  refs:[{d:"14 Jun",t:"Entegris: Vera Rubin Confirms"},{d:"27 Apr",t:"Entegris Spotlight"}],
+  picks:["ENTG"]},
+ {tag:"Reframe",col:"var(--violet)",
+  title:"AI costs start to look like labor costs",
+  body:"A reframing that deepens the short-software thesis. As vendors sell AI as a metered unit of labor rather than per-seat software, customers buy a usage-priced service whose cost scales with ambition — bigger budgets, but variable opex tied to physical bottlenecks. Uber reportedly exhausted its AI budget early after rolling Claude Code across engineering. Now margins, not just multiples, are in play.",
+  refs:[{d:"20 Apr",t:"When AI Costs Look Like Labor Costs"},{d:"14 Apr",t:"Combing Through the Software Rubble"}],
+  picks:["CRM","ORCL"]},
+ {tag:"Macro frame",col:"var(--teal)",
+  title:"The economy, rewired around compute and energy",
+  body:"The widest lens: growth's marginal unit shifts from a new hire to a token and a kilowatt. Digital employees consume compute, memory and electricity instead of wages, breaking the old credit-driven business cycle — funded from hyperscaler balance sheets, not industrial leverage. Dell's blowout quarter (AI-server revenue +757% YoY, 5,000+ AI customers) shows the demand broadening from hyperscalers to enterprise, sovereign and the desk-side edge.",
+  refs:[{d:"8 Jun",t:"The Economy Is Being Rewired"},{d:"1 Jun",t:"Dell & AI Factories"}],
+  picks:["DELL","GOOGL"]},
+];
+function shortDate2(d){if(!d)return '';var m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];var p=d.split('-');return (+p[2])+' '+m[+p[1]-1];}
+function trimT(t){t=t.replace(/^(SPOTLIGHT STOCK UPDATE:?\s*|Spotlight:?\s*|VIDEO PODCAST RECAP)/i,'').trim();return t.length>46?t.slice(0,44)+'…':t;}
+function renderRecent(){
+  var latest=NOTES.slice().filter(function(n){return n.date}).sort(function(a,b){return b.date.localeCompare(a.date)}).slice(0,6);
+  document.getElementById('recentStrip').innerHTML='<div class="rs-lbl">Latest filings</div>'+latest.map(function(n){
+    return '<span class="rs-item"><span class="d">'+shortDate2(n.date)+'</span>'+esc(trimT(n.title))+'</span>';
+  }).join('');
+  document.getElementById('moves').innerHTML=RECENT_MOVES.map(function(m){
+    var refs=m.refs.map(function(r){return '<span class="ref"><b>'+r.d+'</b>'+esc(r.t)+'</span>'}).join('');
+    var picks=m.picks.map(function(p){return '<span class="chip g">'+esc(p)+'</span>'}).join('');
+    return '<div class="move'+(m.feat?' feat':'')+' reveal" style="border-top-color:'+m.col+'">'+
+      '<span class="mtag" style="color:'+m.col+'"><span class="dot2" style="background:'+m.col+'"></span>'+m.tag+'</span>'+
+      '<h3>'+esc(m.title)+'</h3><p>'+esc(m.body)+'</p>'+
+      '<div class="refs">'+refs+'</div><div class="mpick">'+picks+'</div></div>';
+  }).join('');
 }
 
 function renderSpine(){
@@ -535,6 +643,7 @@ function renderArchive(){
   });
   document.getElementById('search').addEventListener('input',function(e){q=e.target.value.toLowerCase().trim();applyFilters();});
   applyFilters();
+  wireArchive();
 }
 function syncThemeButtons(){
   Array.prototype.forEach.call(document.querySelectorAll('.theme-f'),function(x){
@@ -552,21 +661,103 @@ function applyFilters(){
   document.getElementById('count').textContent=list.length+' note'+(list.length===1?'':'s')+
     (activeTheme?' · '+activeTheme:'')+(activeType?' · '+activeType:'')+(q?' · "'+q+'"':'');
   document.getElementById('archiveGrid').innerHTML=list.map(function(n){
-    var tks=(n.tickers||[]).filter(function(t){return t.t}).slice(0,8).map(function(t){return '<span class="tag-s">'+t.t+'</span>'}).join('');
     var thms=(n.themes||[]).map(function(t){return '<span class="tag-s">'+t+'</span>'}).join('');
-    var kp=(n.kp||[]).map(function(k){return '<li>'+esc(k)+'</li>'}).join('');
-    var qb=n.q?'<div class="q">"'+esc(n.q)+'"</div>':'';
-    return '<div class="note" tabindex="0"><div class="meta"><span class="dt">'+fmtFull(n.date)+'</span>'+
-      '<span class="ty">'+n.type+'</span></div><h3>'+esc(n.title)+'</h3><p class="one">'+esc(n.one)+'</p>'+
-      '<div class="det"><div class="thesis">'+esc(n.thesis)+'</div>'+
-      (kp?'<ul class="kp">'+kp+'</ul>':'')+qb+
-      (tks?'<div class="tks">'+tks+'</div>':'')+
-      (thms?'<div class="thms">'+thms+'</div>':'')+'</div></div>';
+    return '<div class="note" data-id="'+esc(n.id)+'">'+
+      '<div class="nhead" tabindex="0" role="button" aria-expanded="false"><div class="meta"><span class="dt">'+fmtFull(n.date)+'</span>'+
+        '<span class="ty">'+n.type+'</span></div><h3>'+esc(n.title)+'</h3><p class="one">'+esc(n.one)+'</p></div>'+
+      '<div class="det">'+
+        '<div class="sumctl">'+
+          '<div class="seg depthseg" role="group" aria-label="summary depth">'+
+            '<button type="button" data-depth="basic" class="on">Basic</button>'+
+            '<button type="button" data-depth="technical">Technical</button>'+
+          '</div>'+
+          '<div class="lenwrap"><input type="range" min="0" max="2" step="1" value="1" class="lenslider" aria-label="summary length"><span class="lenlbl">Medium</span></div>'+
+        '</div>'+
+        '<div class="summary"></div>'+
+        (thms?'<div class="thms">'+thms+'</div>':'')+
+        '<div class="dlrow"><button type="button" class="dlbtn"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>Download full report</button>'+
+          '<span class="dlnote">.txt · the original note</span></div>'+
+      '</div></div>';
   }).join('') || '<p class="dim" style="grid-column:1/-1">No notes match. Try clearing a filter.</p>';
-  Array.prototype.forEach.call(document.querySelectorAll('.note'),function(c){
-    c.addEventListener('click',function(){c.classList.toggle('open')});
-    c.addEventListener('keypress',function(e){if(e.key==='Enter')c.classList.toggle('open')});
+}
+
+/* ---- per-report dynamic summary + download ---- */
+var NOTE_MAP=null;
+function noteById(id){if(!NOTE_MAP){NOTE_MAP={};NOTES.forEach(function(n){NOTE_MAP[n.id]=n;});}return NOTE_MAP[id];}
+function composeSummary(n,len,tech){
+  var h='<p>'+esc(len===0?n.one:n.thesis)+'</p>';
+  if(tech){
+    var kp=n.kp||[];
+    if(len>=1 && kp.length){var show=len===2?kp:kp.slice(0,3);
+      h+='<ul class="kp">'+show.map(function(k){return '<li>'+esc(k)+'</li>'}).join('')+'</ul>';}
+    var tks=(n.tickers||[]).filter(function(t){return t.t});
+    if(tks.length){var lim=len===2?24:6;
+      h+='<div class="tks">'+tks.slice(0,lim).map(function(t){return '<span class="tag-s">'+esc(t.t)+((len===2&&t.s)?' · '+esc(t.s):'')+'</span>'}).join('')+'</div>';}
+  }
+  if(len===2 && n.q){h+='<div class="q">"'+esc(n.q)+'"</div>';}
+  return h;
+}
+function updateCardSummary(card){
+  var n=noteById(card.getAttribute('data-id'));if(!n)return;
+  var len=+card.querySelector('.lenslider').value;
+  var tech=card.querySelector('.depthseg button[data-depth="technical"]').classList.contains('on');
+  card.querySelector('.lenlbl').textContent=['Short','Medium','Full'][len];
+  card.querySelector('.summary').innerHTML=composeSummary(n,len,tech);
+}
+function slugify(s){return (s||'note').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,64);}
+var REPORTS=null,REPORTS_TRIED=false;
+function getReports(cb){
+  if(REPORTS||REPORTS_TRIED){cb(REPORTS);return;}
+  if(typeof fetch!=='function'){REPORTS_TRIED=true;cb(null);return;}
+  fetch('reports.json').then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(j){REPORTS=j;REPORTS_TRIED=true;cb(j);})
+    .catch(function(){REPORTS_TRIED=true;cb(null);});
+}
+function downloadReport(id,btn){
+  var n=noteById(id);if(!n)return;var orig=btn.innerHTML;btn.textContent='Preparing…';
+  getReports(function(map){
+    var L=[],bar=new Array(62).join('=');
+    L.push(n.title);
+    L.push(fmtFull(n.date)+'   ·   Jordi Visser · 22V Research   ·   '+n.type);
+    L.push(bar);L.push('');
+    var full=map&&map[id];
+    if(full){L.push(full.trim());}
+    else{
+      L.push('SUMMARY');L.push('');L.push(n.thesis);L.push('');
+      if((n.kp||[]).length){L.push('KEY POINTS');(n.kp||[]).forEach(function(k){L.push('  • '+k);});L.push('');}
+      if(n.q){L.push('NOTABLE LINE');L.push('  "'+n.q+'"');L.push('');}
+      var tk=(n.tickers||[]).filter(function(t){return t.t});
+      if(tk.length){L.push('NAMES IN PLAY');L.push('  '+tk.map(function(t){return t.t+(t.s?' ('+t.s+')':'')}).join(', '));L.push('');}
+      L.push('[ Full original text was not available offline; this is the structured digest. ]');
+    }
+    L.push('');L.push(bar);
+    L.push('The Visser Files · members research · summaries are interpretive · not investment advice.');
+    var blob=new Blob([L.join('\n')],{type:'text/plain;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=slugify(n.title)+(n.date?' '+n.date:'')+'.txt';
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},2000);
+    btn.innerHTML=orig;
   });
+}
+var archiveWired=false;
+function wireArchive(){
+  if(archiveWired)return;archiveWired=true;
+  var grid=document.getElementById('archiveGrid');
+  grid.addEventListener('click',function(e){
+    var dl=e.target.closest('.dlbtn');if(dl){downloadReport(dl.closest('.note').getAttribute('data-id'),dl);return;}
+    var db=e.target.closest('.depthseg button');if(db){var seg=db.parentNode;
+      Array.prototype.forEach.call(seg.children,function(b){b.classList.remove('on')});db.classList.add('on');
+      updateCardSummary(db.closest('.note'));return;}
+    if(e.target.closest('.lenwrap'))return;
+    var head=e.target.closest('.nhead');if(head){var card=head.closest('.note');
+      var open=card.classList.toggle('open');head.setAttribute('aria-expanded',open?'true':'false');
+      if(open)updateCardSummary(card);return;}
+  });
+  grid.addEventListener('input',function(e){if(e.target.classList.contains('lenslider'))updateCardSummary(e.target.closest('.note'));});
+  grid.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;
+    var head=e.target.closest('.nhead');if(head){e.preventDefault();var card=head.closest('.note');
+      var open=card.classList.toggle('open');head.setAttribute('aria-expanded',open?'true':'false');if(open)updateCardSummary(card);}});
 }
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function fmtFull(d){if(!d)return '—';var m=["January","February","March","April","May","June","July","August","September","October","November","December"];
