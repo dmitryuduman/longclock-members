@@ -809,7 +809,7 @@ function getReports(cb){
 function pdfFile(id){return (typeof PDFMAP!=='undefined'&&PDFMAP[id])?PDFMAP[id]:(id+'.pdf');}
 function downloadReport(id,btn){
   var n=noteById(id);if(!n)return;
-  var f=pdfFile(id),url='pdf/'+f.split('/').map(encodeURIComponent).join('/');
+  var f=pdfFile(id),url=encodeURIComponent(f);
   var a=document.createElement('a');a.href=url;a.download=slugify(n.title)+(n.date?' '+n.date:'')+'.pdf';
   a.rel='noopener';document.body.appendChild(a);a.click();
   setTimeout(function(){a.remove();},1500);
