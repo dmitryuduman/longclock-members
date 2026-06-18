@@ -514,7 +514,7 @@ var NOTEQUOTES={"105163": ["Out of nowhere, with Nvidia near $150, thematic fact
   function unlock(){gate.classList.add('hide');app.classList.add('show');app.setAttribute('aria-hidden','false');
     store('vf_unlocked','1');
     setTimeout(function(){if(!window.__built){build();window.__built=true;}},60);}
-  if(fetchS('vf_unlocked')==='1'){gate.classList.add('hide');app.classList.add('show');app.setAttribute('aria-hidden','false');window.__built=true;build();}
+  if(fetchS('vf_unlocked')==='1'){gate.classList.add('hide');app.classList.add('show');app.setAttribute('aria-hidden','false');window.__built=true;setTimeout(build,0);}
   else{setTimeout(function(){pw.focus()},400);}
   form.addEventListener('submit',function(e){e.preventDefault();
     if(pw.value.trim().toLowerCase()===PASS){unlock();}
